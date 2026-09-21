@@ -1,0 +1,12 @@
+langchain
+langchain-community
+langchain-text-splitters
+unstructured
+markdown
+faiss-cpu
+sentence-transformers
+pypdf
+python-dotenv
+groq
+streamlit
+# crewai # agentic framework
