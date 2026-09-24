@@ -9,4 +9,5 @@ pypdf
 python-dotenv
 groq
 streamlit
+torchvision
 # crewai # agentic framework
