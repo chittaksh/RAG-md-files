@@ -1,12 +1,15 @@
 ## Responsible for 1. Taking the documents. 2. Chunking 3. Embedding 4. FAISS vectorDB
 
-from pathlib import Path
 import pickle
 
+from pathlib import Path
 import faiss
-import numpy as np
 
-from langchain_community.document_loaders import UnstructuredMarkdownLoader
+from readers.pdffiles import load_pdf_docs
+from readers.mdfiles import load_md_docs
+from readers.txtfiles import load_txt_docs
+from readers.docxfiles import load_docx_docs
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter  ## Used for chunking
 from sentence_transformers import SentenceTransformer  ## for converting chunks to embeddings
 
@@ -19,31 +22,7 @@ STORE_DIR = BASE_DIR/ "store"
 INDEX_PATH = STORE_DIR/ "faiss_index"
 CHUNKS_PATH = STORE_DIR / "chunks"
 
-### STEP 1: LOAD DOCUMENTS
-
-def load_docs(data_path: Path):
-    """
-    Load all the md files from the incoming data_path.
-
-    Parameters:
-    data_path: Path
-        Path of the  folder containing the md files
-    
-    Return:
-    docs: list
-        list of langchain document objects
-    """
-    docs = []
-
-    for file in data_path.glob("*.md"):
-        print(f"Loading..: {file.name}")
-
-        loader = UnstructuredMarkdownLoader(str(file))
-
-        docs.extend(loader.load())
-    return docs
-
-### STEP 2: SPLIT DOCS into Chunks
+### STEP 1: SPLIT DOCS into Chunks
 
 def split_docs(docs):
     splitter = RecursiveCharacterTextSplitter(
@@ -52,7 +31,7 @@ def split_docs(docs):
     )
     return splitter.split_documents(docs)
 
-### STEP 3: Create embeddings
+### STEP 2: Create embeddings
 
 def create_embeddings(chunks):
     model = SentenceTransformer(EMBEDDING_MODEL_NAME)
@@ -65,7 +44,7 @@ def create_embeddings(chunks):
     )
     return embeddings
 
-## STEP 4: STORE EMBEDDINGS in FAISS vectorDB
+## STEP 3: STORE EMBEDDINGS in FAISS vectorDB
 
 def store_faiss(embeddings, chunks):
     ## CREATE the STORE_DIR if it does not already exists. 
@@ -89,13 +68,27 @@ def store_faiss(embeddings, chunks):
         pickle.dump(chunks, f)
 
 
-## STEP 5: MAIN INGESTION PIPELINE
+## STEP 4: MAIN INGESTION PIPELINE
 
 if __name__ == "__main__":
 
-    ## 1. load the doc
-    docs = load_docs(DATA_DIR)
-    print(f"Loaded {len(docs)} document pages.")
+    docs = []
+
+    ## 1.1 load the md doc
+    docs.extend(load_md_docs(DATA_DIR))
+    print(f"Loaded {len(docs)} md document pages.")
+
+    ## 1.2 load the pdf doc
+    docs.extend(load_pdf_docs(DATA_DIR))
+    print(f"Loaded {len(docs)} pdf document pages.")
+
+    ## 1.3 load the txt doc 
+    docs.extend(load_txt_docs(DATA_DIR))
+    print(f"Loaded {len(docs)} txt document pages.")
+
+    ## 1.4 load the docx doc
+    docs.extend(load_docx_docs(DATA_DIR))
+    print(f"Loaded {len(docs)} docx document pages.")
           
     ## 2. Split docs into Chunks
     chunks = split_docs(docs)

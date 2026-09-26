@@ -11,7 +11,7 @@ main.py
 CLI interfaces
 Working:
 
-* MD documents
+* PDF/MD/txt/docx documents
 * Document loader
 * Langchain documents
 * Chunking -> Text chunks

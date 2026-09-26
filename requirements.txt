@@ -10,4 +10,6 @@ python-dotenv
 groq
 streamlit
 torchvision
+fontTools
+docx2txt
 # crewai # agentic framework
