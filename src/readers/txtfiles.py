@@ -1,4 +1,5 @@
 from pathlib import Path
+from logger import logging
 
 from langchain_community.document_loaders import TextLoader
 
@@ -19,7 +20,7 @@ def load_txt_docs(data_path: Path):
     docs = []
 
     for file in data_path.glob("*.txt"):
-        print(f"Loading..: {file.name}")
+        logging.info(f"Loading..: {file.name}")
 
         loader = TextLoader(str(file))  ## TextLoader reads the TXT file and extracts text.
 

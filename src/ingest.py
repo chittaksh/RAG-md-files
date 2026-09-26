@@ -5,10 +5,13 @@ import pickle
 from pathlib import Path
 import faiss
 
+from readers.epubfiles import load_epub_docs
 from readers.pdffiles import load_pdf_docs
 from readers.mdfiles import load_md_docs
 from readers.txtfiles import load_txt_docs
 from readers.docxfiles import load_docx_docs
+
+from logger import logging  ## for logging the ingestion process
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter  ## Used for chunking
 from sentence_transformers import SentenceTransformer  ## for converting chunks to embeddings
@@ -26,8 +29,9 @@ CHUNKS_PATH = STORE_DIR / "chunks"
 
 def split_docs(docs):
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 750, ##approx size of each chunk is 750 characters. This is a good size for embeddings and also for LLMs to process.
-        chunk_overlap = 50
+        chunk_size = 1000, ##approx size of each chunk is 1000 characters. 
+        ## This is a good size for embeddings and also for LLMs to process.
+        chunk_overlap = 150
     )
     return splitter.split_documents(docs)
 
@@ -76,32 +80,36 @@ if __name__ == "__main__":
 
     ## 1.1 load the md doc
     docs.extend(load_md_docs(DATA_DIR))
-    print(f"Loaded {len(docs)} md document pages.")
+    logging.info(f"Loaded {len(docs)} md document pages.")
 
     ## 1.2 load the pdf doc
     docs.extend(load_pdf_docs(DATA_DIR))
-    print(f"Loaded {len(docs)} pdf document pages.")
+    logging.info(f"Loaded {len(docs)} pdf document pages.")
 
     ## 1.3 load the txt doc 
     docs.extend(load_txt_docs(DATA_DIR))
-    print(f"Loaded {len(docs)} txt document pages.")
+    logging.info(f"Loaded {len(docs)} txt document pages.")
 
     ## 1.4 load the docx doc
     docs.extend(load_docx_docs(DATA_DIR))
-    print(f"Loaded {len(docs)} docx document pages.")
-          
+    logging.info(f"Loaded {len(docs)} docx document pages.")
+
+    ## 1.5 load the epub doc
+    docs.extend(load_epub_docs(DATA_DIR))
+    logging.info(f"Loaded {len(docs)} epub document pages.")
+
     ## 2. Split docs into Chunks
     chunks = split_docs(docs)
-    print(f"Split into {len(chunks)} chunks.")
+    logging.info(f"Split into {len(chunks)} chunks.")
 
     ## 3. Embeddings
     embeddings = create_embeddings(chunks)
-    print(f"Created embeddings for {len(chunks)} chunks. Embedding shape: {embeddings.shape}")
+    logging.info(f"Created embeddings for {len(chunks)} chunks. Embedding shape: {embeddings.shape}")
 
     ## 4. Store vectors and chunk
     store_faiss(embeddings, chunks)
 
-    print(
+    logging.info(
         f"Processed {len(docs)} document pages "
         f"into {len(chunks)} chunks "
         f"and stored into FAISS vector DB."

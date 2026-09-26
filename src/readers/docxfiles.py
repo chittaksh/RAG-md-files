@@ -1,4 +1,5 @@
 from pathlib import Path
+from logger import logging
 
 from langchain_community.document_loaders import Docx2txtLoader
 
@@ -19,7 +20,7 @@ def load_docx_docs(data_path: Path):
     docs = []
 
     for file in data_path.glob("*.docx"):
-        print(f"Loading..: {file.name}")
+        logging.info(f"Loading..: {file.name}")
 
         loader = Docx2txtLoader(str(file))  ## Docx2txtLoader reads the DOCX file and extracts text.
 

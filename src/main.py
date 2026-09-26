@@ -1,9 +1,10 @@
 ## Responsible for runing the main project, which will take the user input
+from logging import logging
 
 from rag_chain import generate_answer
 
 def main():
-    print("Hello from rag-project!")
+    logging.info("Hello from rag-project!")
 
     while True:
         query = input("\n Ask a question: ").strip()
@@ -11,21 +12,21 @@ def main():
         ## Handle empty input:
 
         if not query:
-            print("Please enter a valid question")
+            logging.warning("Please enter a valid question")
             continue
 
         ## Exit condition
         if query.lower() in ["exit", "quit"]:
-            print("Exiting RAG application")
+            logging.info("Exiting RAG application")
             break
 
         ## Execute RAG pipeline
         try:
             answer = generate_answer(query)
-            print("\n Answer: ")
-            print(answer)
+            logging.info("\n Answer: ")
+            logging.info(answer)
         except Exception as e:
-            print(f"\nError : {e}")
+            logging.error(f"\nError : {e}")
 
 
 if __name__ == "__main__":

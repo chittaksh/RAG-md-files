@@ -1,4 +1,5 @@
 from pathlib import Path
+from logger import logging
 
 from langchain_community.document_loaders import PyPDFLoader   ## to process pdf doc
 
@@ -19,7 +20,7 @@ def load_pdf_docs(data_path: Path):
     docs = []
 
     for file in data_path.glob("*.pdf"):
-        print(f"Loading..: {file.name}")
+        logging.info(f"Loading..: {file.name}")
 
         loader = PyPDFLoader(str(file))  ## PyPDFLoader reads the PDF and extracts text.
 

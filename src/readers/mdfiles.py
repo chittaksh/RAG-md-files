@@ -1,4 +1,5 @@
 from pathlib import Path
+from logger import logging
 
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 
@@ -17,7 +18,7 @@ def load_md_docs(data_path: Path):
     docs = []
 
     for file in data_path.glob("*.md"):
-        print(f"Loading..: {file.name}")
+        logging.info(f"Loading..: {file.name}")
 
         loader = UnstructuredMarkdownLoader(str(file))
 
